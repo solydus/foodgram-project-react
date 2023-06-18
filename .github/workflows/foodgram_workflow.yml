@@ -80,7 +80,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
 #          password: ${{ secrets.PASSWORD }}
-          key: ${{ secrets.SSH_KEYS }}
+          key: ${{ secrets.SSH_KEY }}
           script: |
             sudo docker compose stop
             sudo docker compose rm backend
