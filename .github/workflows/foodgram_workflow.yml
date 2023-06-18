@@ -17,7 +17,7 @@ jobs:
     steps:
     # Запуск actions checkout — готового скрипта 
     # для клонирования репозитория
-    - uses: actions/checkout@v2.5.0
+    - uses: actions/checkout@v2
     - name: Set up Python
       # Запуск actions setup-python — готового скрипта 
       # для развёртывания окружения Python
@@ -48,7 +48,7 @@ jobs:
     steps:
       - name: Check out the repo
         # Проверка доступности репозитория Docker Hub для workflow
-        uses: actions/checkout@v2.5.0
+        uses: actions/checkout@v2
       - name: Set up Docker Buildx
         # Вызов сборщика контейнеров docker
         uses: docker/setup-buildx-action@v1
