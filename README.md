@@ -1,7 +1,6 @@
 # Foodgram - Продуктовый помощник
 
-![foodgram_workflow](https://github.com/solydus/foodgrammm/actions/workflows/foodgram_workflow.yml/badge.svg)
-
+[![Foodgram workflow](https://github.com/solydus/foodrammm/actions/workflows/foodgram_workflow.yml/badge.svg)](https://github.com/solydus/foodrammm/actions/workflows/foodgram_workflow.yml)
 ---
 
  Приложение, на котором пользователи будут публиковать рецепты, добавлять чужие рецепты в избранное и подписываться на публикации других авторов. Сервис «cписок покупок» позволит пользователям создавать список продуктов, которые нужно купить для приготовления выбранных блюд. Есть возможность выгрузить файл (.txt) с перечнем и количеством необходимых ингредиентов для рецептов.
