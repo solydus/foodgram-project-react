@@ -21,7 +21,7 @@ jobs:
     - name: Set up Python
       # Запуск actions setup-python — готового скрипта 
       # для развёртывания окружения Python
-      uses: actions/setup-python@v2.4.0
+      uses: actions/setup-python@v2
       with:
         # Выбор версии Python
         python-version: 3.7
