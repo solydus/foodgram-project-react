@@ -1,6 +1,6 @@
 # Foodgram - Продуктовый помощник
 
-![foodgram_workflow](https://github.com/kaydalova/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)
+![foodgram_workflow](https://github.com/solydus/foodgrammm/actions/workflows/foodgram_workflow.yml/badge.svg)
 
 ---
 
