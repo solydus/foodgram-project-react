@@ -33,7 +33,7 @@ jobs:
         # установка flake8 и его плагинов
         pip install flake8 pep8-naming flake8-broken-line flake8-return flake8-isort
         # установка зависимостей
-        pip install -r foodgram/requirements.txt
+        pip install -r backend/requirements.txt
         
     - name: Test with flake8
       run: |
