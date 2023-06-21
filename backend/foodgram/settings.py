@@ -135,7 +135,7 @@ USE_TZ = True
 AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'api.paginators.PageLimitPagination',
+    'DEFAULT_PAGINATION_CLASS': 'api.paginators.PageNumPagination',
     'PAGE_SIZE': 6,
 
     'DEFAULT_PERMISSION_CLASSES': [
