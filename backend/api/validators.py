@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 def validate_ingredients(ingredients, ingredient_model):
     """
     Проверяет список ингредиентов на наличие дубликатов и правильность заполнения.
-    :param ingredients: список словарей, содержащих данные об ингредиентах.
+    :param ingredients: список словарей, содержащих данные в ингредиентах.
     :param ingredient_model: модель ингредиента, используемая в приложении.
     """
     unique_ids = set()
@@ -66,23 +66,17 @@ def validate_hex(color):
         raise ValidationError('Недопустимое значение цвета')
 
 
-def validate_username(username):
+def validate_real_name(value):
     """
-    Проверяет корректность имени пользователя.
-    :param username: имя пользователя.
+    Валидатор для проверки корректности реального имени пользователя.
     """
-    if not isinstance(username, str):
-        raise ValidationError('Имя пользователя должно быть строкой')
-    if username.lower() == 'me':
-        raise ValidationError('Имя пользователя не может быть "me"')
+    if not re.match(r'^[a-zA-Zа-яА-ЯёЁ\s]+$', value):
+        raise ValidationError(_('Введите корректное имя.'))
 
 
-def validate_real_name(name):
+def validate_username(value):
     """
-    Проверяет корректность имени и фамилии пользователя.
-    :param name: имя или фамилия пользователя.
+    Валидатор для проверки корректности имени пользователя.
     """
-    if not isinstance(name, str):
-        raise ValidationError('Имя и фамилия пользователя должны быть строкой')
-    if len(name.strip()) == 0:
-        raise ValidationError('Имя и фамилия пользователя не могут быть пустыми')
+    if not re.match(r'^[\w.@+-]+$', value):
+        raise ValidationError(_('Имя пользователя может содержать только буквы, цифры и символы @/./+/-/_.'))
