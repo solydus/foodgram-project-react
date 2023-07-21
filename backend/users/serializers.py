@@ -1,12 +1,7 @@
-from django.shortcuts import get_object_or_404
-from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
-from recipes.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
-                            ShoppingCart, Tag)
-from users.models import Subscribe, User
-from .validators import (validate_cooking_time, validate_ingredients,
-                         validate_tags)
+from users.models import User
+
 
 class UserSerializer(serializers.ModelSerializer):
     """ работает с User, отображение рецептов в сериализаторе RecipeSerializer.

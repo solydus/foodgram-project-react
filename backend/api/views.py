@@ -1,4 +1,3 @@
-from django.db.models import Sum
 from django.shortcuts import HttpResponse, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets, mixins
@@ -9,7 +8,6 @@ from rest_framework.views import APIView
 
 from recipes.models import (Favorite,
                             Ingredient,
-                            IngredientInRecipe,
                             Recipe,
                             ShoppingCart,
                             Tag)
@@ -36,45 +34,49 @@ class RecipeViewSet(
     mixins.DestroyModelMixin,  # Миксин для удаления объекта
     viewsets.GenericViewSet  # Базовый класс для вьюсета
 ):
-    queryset = Recipe.objects.all()  # Запрос для получения всех объектов модели Recipe
+    queryset = Recipe.objects.all()  # Запрос для получения  объектов Recipe
     pagination_class = PageNumPagination  # Класс пагинации для списка объектов
-    filter_backends = (DjangoFilterBackend,)  # Фильтр для применения фильтрации
+    filter_backends = (DjangoFilterBackend,)  # Фильтр для применения фильтра
     filterset_class = RecipesFilter  # Класс фильтра для модели Recipe
     serializer_class = RecipeSerializer  # Сериализатор для модели Recipe
-    permission_classes = [IsAuthorOrReadOnly]  # Классы разрешений для доступа к объектам
+    permission_classes = [IsAuthorOrReadOnly]  # Классы разрешений к объектам
 
 
-class TagViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+class TagViewSet(mixins.ListModelMixin,
+                 mixins.RetrieveModelMixin,
+                 viewsets.GenericViewSet):
     # Запрос, который будет использоваться для получения объектов Tag
     queryset = Tag.objects.all()
-    # Сериализатор, который будет использоваться для преобразования объектов Tag в данные JSON
+    # Сериализатор для преобразования объектов Tag в данные JSON
     serializer_class = TagSerializer
 
 
 class IngredientViewSet(mixins.ListModelMixin,
                         mixins.RetrieveModelMixin,
                         viewsets.GenericViewSet):
-        """ Добавление в список ингридиентов доступно только через админку """
-        queryset = Ingredient.objects.all()
-        serializer_class = IngredientSerializer
-        filter_backends = (SearchFilterIngr,)
-        search_fields = ('^name',)
+    """ Добавление в список ингридиентов доступно только через админку """
+    queryset = Ingredient.objects.all()
+    serializer_class = IngredientSerializer
+    filter_backends = (SearchFilterIngr,)
+    search_fields = ('^name',)
 
 
-class SubscriptionsViewSet(mixins.ListModelMixin, 
-                           mixins.CreateModelMixin, 
-                           mixins.RetrieveModelMixin, 
-                           mixins.UpdateModelMixin, 
-                           mixins.DestroyModelMixin, 
+class SubscriptionsViewSet(mixins.ListModelMixin,
+                           mixins.CreateModelMixin,
+                           mixins.RetrieveModelMixin,
+                           mixins.UpdateModelMixin,
+                           mixins.DestroyModelMixin,
                            viewsets.GenericViewSet):
-    serializer_class = SubscribeSerializer 
-    permission_classes = [IsAuthenticated, ] 
-    pagination_class = PageNumPagination 
+    serializer_class = SubscribeSerializer
+    permission_classes = [IsAuthenticated, ]
+    pagination_class = PageNumPagination
 
     queryset = Subscribe.objects.none()  # Пустой queryset
 
-    def get_queryset(self): 
-        return Subscribe.objects.filter(user=self.request.user).prefetch_related('author')
+    def get_queryset(self):
+        return Subscribe.objects.filter(
+            user=self.request.user).prefetch_related('author')
+
 
 class SubscribeCreateView(APIView):
     """ сделать/удалить подписку """

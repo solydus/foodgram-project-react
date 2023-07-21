@@ -9,8 +9,6 @@ from users.models import Subscribe, User
 from .serializers import (SubscribeSerializer)
 
 
-from rest_framework import mixins
-
 class SubscribeCreateView(APIView):
     """
     Класс для создания и удаления подписок

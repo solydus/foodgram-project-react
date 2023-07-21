@@ -6,7 +6,8 @@ from recipes.models import Favorite, Recipe, ShoppingCart
 
 class RecipesFilter(filters.FilterSet):
     """
-    Фильтрует рецепты по отношению к тегам, автору, избранному и нахождению в корзине пользователя.
+    Фильтрует рецепты по отношению к тегам, автору,
+    избранному и нахождению в корзине пользователя.
     """
     is_in_shopping_cart = filters.BooleanFilter(method='shopping_cart_filter')
     is_favorited = filters.BooleanFilter(method='favorite_filter')
@@ -17,10 +18,9 @@ class RecipesFilter(filters.FilterSet):
         fields = ('tags', 'author', 'is_favorited', 'is_in_shopping_cart')
 
     def favorite_filter(self, queryset, name, value):
-        recipe_ids = FavoriteAdmin.objects.filter(
+        recipe_ids = Favorite.objects.filter(
             like_recipe=self.request.user
         ).values_list('recipe_id', flat=True)
-        
         if value:
             return queryset.filter(pk__in=recipe_ids)
         else:
@@ -30,7 +30,6 @@ class RecipesFilter(filters.FilterSet):
         recipe_ids = ShoppingCart.objects.filter(
             cart_owner=self.request.user
         ).values_list('recipe_id', flat=True)
-        
         if value:
             return queryset.filter(pk__in=recipe_ids)
         return queryset
