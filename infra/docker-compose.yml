@@ -2,7 +2,11 @@ version: '3.8'
 
 services:
   frontend:
+<<<<<<< HEAD
     image: solydus/frontending:v1.02.2023
+=======
+    image: solydus/frontending:latest
+>>>>>>> 282535e1136e115284fe0b1962dbb830000c0fff
     volumes:
       - ./frontend/build:/usr/share/nginx/html/
 
@@ -14,9 +18,14 @@ services:
     env_file: ./.env
 
   backend:
+<<<<<<< HEAD
     build:
       context: .
       dockerfile: ./foodgram/Dockerfile
+=======
+    image: solydus/backend:latest
+    #build: ../foodgram
+>>>>>>> 282535e1136e115284fe0b1962dbb830000c0fff
     restart: always
     command: gunicorn foodgram.wsgi:application --bind 0.0.0.0:8000 --workers 4
     volumes:
