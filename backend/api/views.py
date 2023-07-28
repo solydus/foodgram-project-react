@@ -15,7 +15,6 @@ from users.models import Subscribe, User
 
 from .shopping_utils import generate_shopping_list
 from .filters import SearchFilterIngr, RecipesFilter
-from .mixins import CreateDestroyAll
 from .paginators import PageNumPagination
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (FavoriteRecipeSerializer,
@@ -142,31 +141,32 @@ class FavoriteViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ShoppingCartViewSet(CreateDestroyAll):
-    """ Добавлять и удалять рецепты из корзины покупок """
-    queryset = ShoppingCart.objects.all()
+class ShoppingCartViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
     serializer_class = ShoppingCartSerializer
-    permission_classes = [IsAuthenticated, ]
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        recipe = get_object_or_404(Recipe, pk=self.kwargs.get('recipe_id'))
-        context.update({'recipe': recipe})
-        context.update({'cart_owner': self.request.user})
-        return context
+    def get_queryset(self):
+        return ShoppingCart.objects.filter(cart_owner=self.request.user)
 
-    @action(methods=('delete',), detail=True)
+    def perform_create(self, serializer):
+        recipe = get_object_or_404(Recipe,
+                                   pk=self.kwargs.get('recipe_id'))
+        serializer.save(recipe=recipe,
+                        cart_owner=self.request.user)
+
+    @action(methods=['delete'], detail=True)
     def delete(self, request, recipe_id):
-        recipe = self.kwargs.get('recipe_id')
-        cart_owner = self.request.user
+        recipe = get_object_or_404(Recipe,
+                                   pk=recipe_id)
         if not ShoppingCart.objects.filter(recipe=recipe,
-                                           cart_owner=cart_owner).exists():
+                                           cart_owner=self.request.user
+                                           ).exists():
             return Response({'errors': 'Рецепт не добавлен в список покупок'},
                             status=status.HTTP_400_BAD_REQUEST)
-        get_object_or_404(
-            ShoppingCart,
-            cart_owner=cart_owner,
-            recipe=recipe).delete()
+        ShoppingCart.objects.filter(
+            recipe=recipe,
+            cart_owner=self.request.user
+        ).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
