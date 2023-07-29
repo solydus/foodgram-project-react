@@ -8,7 +8,7 @@ app_name = 'api'
 router = DefaultRouter()
 router.register('recipes', views.RecipeViewSet, basename='recipes')
 router.register(
-    r'recipes/(?P<recipe_id>\d+)/favorite',
+    r'recipes/(?P<recipe_id>\d+)/FavoriteAdmin',
     views.FavoriteViewSet, basename='favorite')
 router.register(
     'users/subscriptions',
@@ -19,12 +19,12 @@ router.register(
     r'recipes/(?P<recipe_id>\d+)/shopping_cart',
     views.ShoppingCartViewSet, basename='shopping_cart')
 
-
 urlpatterns = [
     path(
         'recipes/download_shopping_cart/',
         views.DownloadShoppingCart.as_view()),
     path('', include(router.urls)),
-    path('', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
-    path('users/<int:author_id>/subscribe/', views.SubscribeAPIView.as_view())]
+    path('', include('djoser.urls')),
+    path('users/<int:author_id>/subscribe/',
+         views.SubscribeCreateView.as_view())]
