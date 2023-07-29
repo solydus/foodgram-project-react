@@ -1,37 +1,30 @@
 from django_filters.rest_framework import FilterSet, filters
-from rest_framework.filters import SearchFilter
-
-from recipes.models import Favorite, Recipe, ShoppingCart
+from recipes.models import Recipe, Tag
 
 
 class RecipeFilter(FilterSet):
-    """
-    фильтрация по избранному, автору, списку покупок и тегам.
-    """
-    tags = filters.AllValuesMultipleFilter(field_name='tags__slug')
-    is_favorited = filters.BooleanFilter(method='filter_is_favorited')
+    ''' Фильтр для рецептов '''
+
+    tags = filters.ModelMultipleChoiceFilter(field_name='tags__slug',
+                                             to_field_name='slug',
+                                             queryset=Tag.objects.all())
+    is_favorited = filters.BooleanFilter(
+        method='is_favorited_filter')
     is_in_shopping_cart = filters.BooleanFilter(
-        method='filter_is_in_shopping_cart'
-    )
+        method='is_in_shopping_cart_filter')
 
     class Meta:
         model = Recipe
-        fields = ('tags', 'author', 'is_favorited', 'is_in_shopping_cart')
+        fields = ('tags', 'author',)
 
-    def filter_is_favorited(self, queryset, name, value):
-        reс_pk = Favorite.objects.filter(
-            recipe_lover=self.request.user).values('recipe_id')
-        if value:
-            return queryset.filter(pk__in=reс_pk)
+    def is_favorited_filter(self, queryset, name, value):
+        user = self.request.user
+        if value and user.is_authenticated:
+            return queryset.filter(favorite_recipe__user=user)
         return queryset
 
-    def filter_is_in_shopping_cart(self, queryset, name, value):
-        reс_pk = ShoppingCart.objects.filter(
-            cart_owner=self.request.user).values('recipe_id')
-        if value:
-            return queryset.filter(pk__in=reс_pk)
+    def is_in_shopping_cart_filter(self, queryset, name, value):
+        user = self.request.user
+        if value and user.is_authenticated:
+            return queryset.filter(shopping_recipe__user=user)
         return queryset
-
-
-class IngredientSearchFilter(SearchFilter):
-    search_param = 'name'
