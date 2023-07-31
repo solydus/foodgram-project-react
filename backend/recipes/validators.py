@@ -1,35 +1,24 @@
-import re
-
 from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
+from django.db import models
 
 
-def validate_hex(value):
-    """
-    Валидатор для проверки корректности шестнадцатеричного кода цвета.
-    """
-    if not re.match(r'^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$', value):
-        raise ValidationError(_('Цвет в формате #RRGGBB.'))
+def validate_amount(value):
+    if value <= 0:
+        raise ValidationError(
+            'Количество ингредиентов '
+            'не может быть отрицательным или равняться 0.'
+        )
 
 
-def validate_ingredient_name(value):
-    """
-    Валидатор для проверки корректности имени ингредиента.
-    """
-    if not re.match(r'^[a-zA-Z0-9,&()\. -]+$', value):
-        raise ValidationError(_('Имя ингредиента содержать  буквы'))
+def validate_cooking_time(value):
+    if value < 1:
+        raise ValidationError(
+            'Минимальное время приготовления 1 минута.'
+        )
 
 
-class UnicodeUsernameValidator:
-    """
-    Валидатор для проверки допустимости символов в имени пользователя.
-    """
-    regex = r'^[\w.@+-]+$'
-    message = _('Имя пользователя может содержать только буквы')
-
-    def __call__(self, value):
-        """
-        Проверка значения на допустимость символов.
-        """
-        if not re.match(self.regex, value):
-            raise ValidationError(self.message)
+def unique_constraint(name, *fields):
+    return models.UniqueConstraint(
+        fields=fields,
+        name=name
+    )

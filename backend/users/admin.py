@@ -1,16 +1,20 @@
 from django.contrib import admin
 
-from .models import Subscribe, User
+from .models import User
 
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    recipe_lover = ('id', 'username', 'email', 'first_name', 'last_name')
-    search_fields = ('username', 'email')
+    """Регистрация модели User в интерфейсе администратора."""
 
+    list_display = (
+        'id',
+        'email',
+        'username',
+        'first_name',
+        'last_name',
+    )
 
-@admin.register(Subscribe)
-class SubscribeAdmin(admin.ModelAdmin):
-    recipe_lover = ('id', 'user', 'author')
-    list_filter = ('user',)
-    search_fields = ('user__username', 'author__username')
+    empty_value_display = 'Значение отсутствует'
+    search_fields = ('username', 'email',)
+    list_filter = ('username', 'email',)
