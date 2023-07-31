@@ -22,8 +22,7 @@ class RecipesFilter(filters.FilterSet):
         ).values_list('recipe_id', flat=True)
         if value:
             return queryset.filter(pk__in=recipe_ids)
-        else:
-            return queryset
+        return queryset
 
     def shopping_cart_filter(self, queryset, name, value):
         recipe_ids = ShoppingCart.objects.filter(
