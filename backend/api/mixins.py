@@ -1,10 +1,8 @@
 from rest_framework import mixins, viewsets
 
 
-class CreateDestroyViewSet(mixins.CreateModelMixin,
-                           mixins.DestroyModelMixin,
-                           viewsets.GenericViewSet):
-    """
-    Вьюсет определяющий методы POST и DELETE
-    """
+class CreateDestroyAll(mixins.CreateModelMixin,
+                       mixins.DestroyModelMixin,
+                       viewsets.GenericViewSet):
+    """ Для методов POST/DELETE """
     pass

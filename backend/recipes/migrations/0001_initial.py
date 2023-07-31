@@ -95,7 +95,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('recipe', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='+', to='recipes.Recipe', verbose_name='Рецепт')),
-                ('recipe_lover', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='favorite', to=settings.AUTH_USER_MODEL, verbose_name='Добавил в избранное')),
+                ('like_recipe', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='favorite', to=settings.AUTH_USER_MODEL, verbose_name='Добавил в избранное')),
             ],
             options={
                 'verbose_name': 'Любимый рецепт',
