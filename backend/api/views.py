@@ -1,28 +1,20 @@
 from django.shortcuts import HttpResponse, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import status, viewsets, mixins
+from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
+from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
-from recipes.models import (Favorite,
-                            Ingredient,
-                            Recipe,
-                            ShoppingCart,
-                            Tag)
 from users.models import Subscribe, User
 
-from .shopping_utils import generate_shopping_list
-from .filters import SearchFilterIngr, RecipesFilter
+from .filters import RecipesFilter, SearchFilterIngr
 from .paginators import PageNumPagination
 from .permissions import IsAuthorOrReadOnly
-from .serializers import (FavoriteRecipeSerializer,
-                          IngredientSerializer,
-                          RecipeSerializer,
-                          ShoppingCartSerializer,
-                          SubscribeSerializer,
-                          TagSerializer)
+from .serializers import (FavoriteRecipeSerializer, IngredientSerializer,
+                          RecipeSerializer, ShoppingCartSerializer,
+                          SubscribeSerializer, TagSerializer)
+from .shopping_utils import generate_shopping_list
 
 
 class RecipeViewSet(
