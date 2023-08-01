@@ -8,7 +8,7 @@ app_name = 'api'
 router = DefaultRouter()
 router.register('recipes', views.RecipeViewSet, basename='recipes')
 router.register(
-    r'recipes/(?P<recipe_id>\d+)/FavoriteAdmin',
+    r'recipes/(?P<recipe_id>\d+)/favorite',
     views.FavoriteViewSet, basename='favorite')
 router.register(
     'users/subscriptions',
@@ -18,6 +18,7 @@ router.register('ingredients', views.IngredientViewSet, basename='ingredients')
 router.register(
     r'recipes/(?P<recipe_id>\d+)/shopping_cart',
     views.ShoppingCartViewSet, basename='shopping_cart')
+
 
 urlpatterns = [
     path(
