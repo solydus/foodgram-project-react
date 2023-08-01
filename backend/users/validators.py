@@ -1,6 +1,5 @@
 import re
 
-from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
@@ -22,11 +21,3 @@ def validate_username(value):
     """
     if not re.match(r'^[\w.@+-]+$', value):
         raise ValidationError(_('Имя может содержать только буквы, цифры'))
-
-    if User.objects.filter(username=value).exists():
-        raise ValidationError(_('Данное имя пользователя уже занято.'))
-
-
-def validate_email(value):
-    if User.objects.filter(email=value).exists():
-        raise ValidationError(_('Данный адрес электронной почты уже занят.'))

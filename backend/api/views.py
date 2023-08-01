@@ -40,6 +40,7 @@ class TagViewSet(mixins.ListModelMixin,
     queryset = Tag.objects.all()
     # Сериализатор для преобразования объектов Tag в данные JSON
     serializer_class = TagSerializer
+    pagination_class = None
 
 
 class IngredientViewSet(mixins.ListModelMixin,
