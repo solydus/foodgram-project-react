@@ -13,16 +13,18 @@ services:
     # образ, из которого должен быть запущен контейнер
     image: postgres:13.0-alpine
     restart: always
-    # volume и связанная с ним директория в контейнереь
+    # volume и связанная с ним директория в контейнере
     volumes:
       - database_value:/var/lib/postgresql/data/
     # адрес файла, где хранятся переменные окружения
     env_file:
-      - ./.env
+      - .env
+    ports:
+      - 5432:5432
 
   backend:
-    image: solydus/backend:latest
-    #build: ../foodgram
+    #image: solydus/backend:latest
+    build: ../backend
     restart: always
     # command: >
     #   bash -c "python manage.py migrate &&
@@ -39,7 +41,7 @@ services:
     depends_on:
       - db
     env_file:
-      - ./.env
+      - .env
 
 
   nginx:
