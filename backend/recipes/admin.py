@@ -1,14 +1,7 @@
 from django.contrib import admin
 
-from .models import (Favorite, Follow, Ingredient, IngredientRecipe, Recipe,
-                     ShoppingList, Tag)
-
-admin.site.empty_value_display = 'Значение отсутствует'
-
-
-@admin.register(Tag)
-class TagAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'slug')
+from .models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
+                     ShoppingCart, Tag)
 
 
 @admin.register(Ingredient)
@@ -17,63 +10,32 @@ class IngredientAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 
-class IngredientRecipeInline(admin.TabularInline):
-    model = IngredientRecipe
-    min_num = 1
-    extra = 1
-
-
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = (
-        'id',
-        'name',
-        'author',
-        'get_favorites',
-        'get_tags',
-        'get_ingredients',
-    )
-    list_filter = ('author', 'name', 'tags')
-    search_fields = ('name',)
-    inlines = (IngredientRecipeInline,)
-
-    def get_favorites(self, obj):
-        return obj.favorites.count()
-
-    get_favorites.short_description = (
-        'Количество добавлений рецепта в избранное'
-    )
-
-    def get_tags(self, obj):
-        return ', '.join((tag.name for tag in obj.tags.all()))
-
-    get_tags.short_description = 'Тег или список тегов'
-
-    def get_ingredients(self, obj):
-        return ', '.join(
-            (ingredient.name for ingredient in obj.ingredients.all())
-        )
-
-    get_ingredients.short_description = 'Ингридиенты'
+    list_display = ('id', 'name', 'author')
+    list_filter = ('name', 'author', 'tags')
+    filter_horizontal = ('tags',)
 
 
-@admin.register(Follow)
-class FollowAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'author')
-    search_fields = ('user', 'author')
-    list_filter = ('user', 'author')
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'slug', 'color')
+    list_filter = ('name',)
+
+
+@admin.register(IngredientInRecipe)
+class IngredientInRecipeAdmin(admin.ModelAdmin):
+    list_display = ('id', 'recipe', 'ingredient', 'amount')
+    list_filter = ('ingredient',)
 
 
 @admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'recipe')
+    list_display = ('recipe', 'recipe_lover')
+    list_filter = ('recipe_lover',)
 
 
-@admin.register(IngredientRecipe)
-class IngredientRecipeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'ingredient', 'recipe', 'amount')
-
-
-@admin.register(ShoppingList)
-class ShoppingListAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'recipe')
+@admin.register(ShoppingCart)
+class ShoppingCartAdmin(admin.ModelAdmin):
+    list_display = ('cart_owner', 'recipe')
+    list_filter = ('cart_owner',)
