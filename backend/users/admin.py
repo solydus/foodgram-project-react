@@ -1,26 +1,36 @@
 from django.contrib import admin
+from django.contrib.auth import get_user_model
 
-from .models import Subscribe, User
+from users.models import Subscription
+
+User = get_user_model()
 
 
-@admin.register(User)
+class SubscriptionAdmin(admin.ModelAdmin):
+    list_display = (
+        "author",
+        "subscriber",
+    )
+    list_filter = (
+        "author",
+        "subscriber",
+    )
+
+    class Meta:
+        ordering = ["-id"]
+
+
 class UserAdmin(admin.ModelAdmin):
     list_display = (
-        'id',
-        'username',
-        'email',
-        'first_name',
-        'last_name',
-        'password',
+        "id",
+        "username",
+        "email",
     )
-    list_filter = ('username',)
+    list_filter = (
+        "username",
+        "email",
+    )
 
 
-@admin.register(Subscribe)
-class SubscribeAdmin(admin.ModelAdmin):
-    list_display = (
-        'id',
-        'user',
-        'author',
-    )
-    list_filter = ('user',)
+admin.site.register(User, UserAdmin)
+admin.site.register(Subscription, SubscriptionAdmin)
