@@ -1,105 +1,60 @@
-# Foodgram - Продуктовый помощник
+# Дипломный проект Яндекс Практикум продуктовый помощник Foodrgam
 
-[![Foodgram workflow](https://github.com/solydus/foodrammm/actions/workflows/foodgram_workflow.yml/badge.svg)](https://github.com/solydus/foodrammm/actions/workflows/foodgram_workflow.yml)
----
+Проект представляет собой онлайн-сервис и API для него. На этом сервисе пользователи могут публиковать рецепты, подписываться на публикации других пользователей, добавлять понравившиеся рецепты в список «Избранное», а перед походом в магазин скачивать сводный список продуктов, необходимых для приготовления выбранных блюд.
 
- Приложение, на котором пользователи будут публиковать рецепты, добавлять чужие рецепты в избранное и подписываться на публикации других авторов. Сервис «cписок покупок» позволит пользователям создавать список продуктов, которые нужно купить для приготовления выбранных блюд. Есть возможность выгрузить файл (.txt) с перечнем и количеством необходимых ингредиентов для рецептов.
+## 
 
-## Доступ
+[![N|Solid](https://cldup.com/dTxpPi9lDf.thumb.png)](https://nodesource.com/products/nsolid)
 
-Проект НЕ запущен на сервере и НЕ доступен по адресу:
-[84.252.143.230
-](http://84.252.143.230/)
+[![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
-## Стек технологий
-- Python
+## Реализация
+- Проект завернут в Docker-контейнеры;
+- Образы foodgram_frontend и foodgram_backend запушены на DockerHub;
+- Реализован workflow c автодеплоем на удаленный сервер и отправкой сообщения в Telegram;
+- Проект к проекту : http://foodgram911.sytes.net/
+
+## Технологии
+
+- Python 3.9
 - Django
 - Django REST Framework
 - PostgreSQL
 - Docker
+- Gunicorn
+- Nginx
 - Github Actions
 
-## Установка проекта локально
 
-* Склонировать репозиторий на локальную машину:
-```bash
-git clone git@github.com:Kaydalova/foodgram-project-react.git
-cd foodgram-project-react
+## Запуск проекта на сервере
+
+##### 1. Создать .env файл с переменными окружения в каталоге infra
 ```
-
-* Cоздать и активировать виртуальное окружение:
-
-```bash
-python3 -m venv venv
-```
-
-```bash
-source venv/bin/activate
-```
-
-* Cоздайте файл `.env` в директории `/infra/` с содержанием:
-
-```
-SECRET_KEY=секретный ключ django
-DB_ENGINE=django.db.backends.postgresql
-DB_NAME=postgres
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
+POSTGRES_DB= postgres_db
+POSTGRES_USER= postgres_user
+POSTGRES_PASSWORD= postgres_password
 DB_HOST=db
 DB_PORT=5432
 ```
 
-* Перейти в директирию и установить зависимости из файла requirements.txt:
-
-```bash
-cd foodgram/
-pip install -r requirements.txt
+##### 2. Скопировать содержимое каталога infra на сервер и запустить docker-compose.yml
+```
+sudo docker compose -f docker-compose.yml up -d
 ```
 
-* Выполните миграции:
-
-```bash
-python manage.py migrate
-```
-* Загрузите ингредиенты:
-```bash
-python manage.py import_csv
+##### 2. Применить миграции, собрать статику, и загрузить ингридиенты
 
 ```
-* Запустите сервер:
-```bash
-python manage.py runserver
+sudo docker compose exec backend python manage.py migrate
+sudo docker compose exec backend python manage.py collectstatic --no-input
+sudo docker compose exec backend python manage.py load_ingredients
 ```
-
-## Запуск проекта в Docker контейнере
-* Установите Docker и docker compose плагин.
-
-Параметры запуска описаны в файлах `docker-compose.yml` и `nginx.conf` которые находятся в директории `infra/`.  
-Измените список ip адресов в файле `nginx.conf`
-
-* Запустите docker compose:
-```bash
-docker compose up -d --build
-```  
-  > После сборки появляются 3 контейнера:
-  > 1. контейнер базы данных **db**
-  > 2. контейнер приложения **backend**
-  > 3. контейнер web-сервера **nginx**
-* Примените миграции:
-```bash
-docker compose exec backend python manage.py migrate
-```
-* Загрузите ингредиенты:
-```bash
-docker сompose exec backend python manage.py import_csv
-```
+##### 3. Создать суперюзера
 
 ```
-* Создайте администратора:
-```bash
-docker compose exec backend python manage.py createsuperuser
+sudo docker compose exec backend python manage.py createsuperuser
 ```
-* Соберите статику:
-```bash
-docker compose exec backend python manage.py collectstatic --noinput
-```
+
+## Автор
+Кирилл Машталов  https://github.com/kirmasht/
+

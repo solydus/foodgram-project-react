@@ -1,69 +1,50 @@
 from django.contrib import admin
 
-from .models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
-                     ShoppingCart, Tag)
+from .models import FavoriteRecipe, IngredientsAmount, Recipe, ShoppingCart
 
 
-@admin.register(Ingredient)
-class IngredientAdmin(admin.ModelAdmin):
-    list_display = (
-        'id',
-        'name',
-        'measurement_unit',
-    )
-    list_filter = ('name',)
-
-
-class RecipeIngredientInline(admin.TabularInline):
-    model = IngredientInRecipe
+class IngredientsAmountInline(admin.TabularInline):
+    model = IngredientsAmount
+    extra = 1
     min_num = 1
+    autocomplete_fields = ('ingredient',)
 
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    inlines = (RecipeIngredientInline, )
-    list_display = (
-        'id',
-        'name',
-        'author')
-    list_filter = ('name', 'author', 'tags',)
+    list_display = ('name', 'author', 'display_tags',
+                    'favorite_count', 'shopping_count')
+    list_filter = ('name', 'author', 'tags')
+    search_fields = ('name', 'author__username', 'author__last_name',
+                     'author__first_name', 'tags__name')
+    filter_vertical = ('tags',)
+    inlines = (IngredientsAmountInline,)
+
+    def favorite_count(self, obj):
+        return obj.favorites.count()
+
+    def shopping_count(self, obj):
+        return obj.shopcarts.count()
+
+    def display_tags(self, obj):
+        return ', '.join([tag.name for tag in obj.tags.all()])
+
+    favorite_count.short_description = 'В избранном'
+    shopping_count.short_description = 'В списке покупок'
+    display_tags.short_description = 'Теги'
 
 
-@admin.register(Tag)
-class TagAdmin(admin.ModelAdmin):
-    list_display = (
-        'id',
-        'name',
-        'slug',
-        'color',
-    )
-    list_filter = ('name',)
+@admin.register(IngredientsAmount)
+class IngredientsAmountAdmin(admin.ModelAdmin):
+    list_display = ('recipe', 'ingredient', 'amount')
 
 
-# @admin.register(IngredientInRecipe)
-# class IngredientInRecipeAdmin(admin.ModelAdmin):
-#     list_display = (
-#         'id',
-#         'recipe',
-#         'ingredient',
-#         'amount',
-#     )
-#     list_filter = ('ingredient',)
-
-
-@admin.register(Favorite)
-class Favorite(admin.ModelAdmin):
-    list_display = (
-        'recipe',
-        'recipe_lover',
-    )
-    list_filter = ('recipe_lover',)
+@admin.register(FavoriteRecipe)
+class FavoriteRecipeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'recipe',)
+    list_filter = ('user', 'recipe',)
 
 
 @admin.register(ShoppingCart)
-class ShoppingCart(admin.ModelAdmin):
-    list_display = (
-        'cart_owner',
-        'recipe',
-    )
-    list_filter = ('cart_owner',)
+class ShoppingCartAdmin(admin.ModelAdmin):
+    list_display = ('user', 'recipe',)

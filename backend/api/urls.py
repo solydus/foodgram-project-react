@@ -1,30 +1,21 @@
-from django.urls import include, path
+from ingridients.views import IngredientViewSet
 from rest_framework.routers import DefaultRouter
 
-from api import views
 
-app_name = 'api'
+from django.urls import include, path
 
-router = DefaultRouter()
-router.register('recipes', views.RecipeViewSet, basename='recipes')
-router.register(
-    r'recipes/(?P<recipe_id>\d+)/favorite',
-    views.FavoriteViewSet, basename='favorite')
-router.register(
-    'users/subscriptions',
-    views.SubscriptionsViewSet, basename='subscriptions')
-router.register('tags', views.TagViewSet, basename='tags')
-router.register('ingredients', views.IngredientViewSet, basename='ingredients')
-router.register(
-    r'recipes/(?P<recipe_id>\d+)/shopping_cart',
-    views.ShoppingCartViewSet, basename='shopping_cart')
+from tags.views import TagViewSet
+from recipes.views import RecipeViewSet
+from users.views import UsersViewSet
 
+router_v1 = DefaultRouter()
+router_v1.register('users', UsersViewSet, 'users')
+router_v1.register('tags', TagViewSet, 'tags')
+router_v1.register('ingredients', IngredientViewSet, 'ingredients')
+router_v1.register('recipes', RecipeViewSet, 'recipes')
 
-urlpatterns = [
-    path(
-        'recipes/download_shopping_cart/',
-        views.DownloadShoppingCart.as_view()),
-    path('', include(router.urls)),
+urlpatterns = (
+    path('', include(router_v1.urls)),
     path('', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
-    path('users/<int:author_id>/subscribe/', views.SubscribeAPIView.as_view())]
+)
