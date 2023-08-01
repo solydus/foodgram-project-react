@@ -13,7 +13,7 @@ services:
     # образ, из которого должен быть запущен контейнер
     image: postgres:13.0-alpine
     restart: always
-    # volume и связанная с ним директория в контейнере
+    # volume и связанная с ним директория в контейнереь
     volumes:
       - database_value:/var/lib/postgresql/data/
     # адрес файла, где хранятся переменные окружения
