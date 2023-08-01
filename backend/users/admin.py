@@ -1,36 +1,20 @@
 from django.contrib import admin
-from django.contrib.auth import get_user_model
 
-from users.models import Subscription
-
-User = get_user_model()
+from .models import User
 
 
-class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = (
-        "author",
-        "subscriber",
-    )
-    list_filter = (
-        "author",
-        "subscriber",
-    )
-
-    class Meta:
-        ordering = ["-id"]
-
-
+@admin.register(User)
 class UserAdmin(admin.ModelAdmin):
+    """Регистрация модели User в интерфейсе администратора."""
+
     list_display = (
-        "id",
-        "username",
-        "email",
-    )
-    list_filter = (
-        "username",
-        "email",
+        'id',
+        'email',
+        'username',
+        'first_name',
+        'last_name',
     )
 
-
-admin.site.register(User, UserAdmin)
-admin.site.register(Subscription, SubscriptionAdmin)
+    empty_value_display = 'Значение отсутствует'
+    search_fields = ('username', 'email',)
+    list_filter = ('username', 'email',)
