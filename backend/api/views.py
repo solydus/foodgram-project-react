@@ -35,14 +35,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthorOrReadOnly]
 
 
-class TagViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    Для тэгов нужны только list() и retrieve() методы.
-    Доступен для чтения всем, изменять можно только через админку.
-    """
+class TagViewSet(mixins.ListModelMixin,
+                 mixins.RetrieveModelMixin,
+                 viewsets.GenericViewSet):
+    # Запрос, который будет использоваться для получения объектов Tag
     queryset = Tag.objects.all()
+    # Сериализатор для преобразования объектов Tag в данные JSON
     serializer_class = TagSerializer
-    pagination_class = None
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
