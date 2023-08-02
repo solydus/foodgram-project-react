@@ -32,7 +32,7 @@ jobs:
           # обновление pip
           python -m pip install --upgrade pip
           # установка flake8 и его плагинов
-          pip install flake8 pep8-naming flake8-return
+          pip install flake8 flake8-return
           # установка зависимостей
           pip install -r backend/requirements.txt
         
