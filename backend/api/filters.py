@@ -29,6 +29,9 @@ class RecipeFilter(FilterSet):
     def filter_is_favorited(self, queryset, name, value):
         return self.filter_queryset_by_model(queryset, Favorite, value)
 
+    def favorite_filter(self, queryset, name, value):
+        return self.filter_is_favorited(queryset, name, value)
+
     def filter_is_in_shopping_cart(self, queryset, name, value):
         return self.filter_queryset_by_model(queryset, ShoppingCart, value)
 
