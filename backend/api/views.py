@@ -1,4 +1,3 @@
-from django.db.models import Sum
 from django.shortcuts import HttpResponse, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
@@ -7,20 +6,26 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from recipes.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
+from recipes.models import (Favorite, Ingredient, Recipe,
                             ShoppingCart, Tag)
 from users.models import Subscribe, User
 
+from .shopping_utils import generate_shopping_list
 from .filters import IngredientSearchFilter, RecipeFilter
 from .mixins import CreateDestroyViewSet
 from .paginators import PageLimitPagination
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (FavoriteRecipeSerializer, IngredientSerializer,
                           RecipeSerializer, ShoppingCartSerializer,
-                          SubscribeSerializer, TagSerializer)
+                          SubscriptionSerializer, TagSerializer)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
+    """
+    viewset для работы с моделью Recipe.
+    Он наследуется от ModelViewSet,
+    что предоставляет все стандартные операции CRUD
+    """
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     permission_classes = [IsAuthorOrReadOnly]
@@ -30,12 +35,22 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    viewset для работы с моделью Tag.
+    Он наследуется от ReadOnlyModelViewSet,
+    предоставляет только операции чтения для модели Tag.
+    """
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    viewset для работы с моделью Ingredient.
+    Он также наследуется от ReadOnlyModelViewSet,
+    поэтому предоставляет только операции чтения для модели Ingredient.
+    """
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     filter_backends = [IngredientSearchFilter]
@@ -43,13 +58,26 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
 
 
+class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    используется для создания представления API,
+    которое обеспечивает только чтение (read-only)
+    операций для модели Ingredient
+    """
+    queryset = Ingredient.objects.all()
+    serializer_class = IngredientSerializer
+    pagination_class = None
+    filter_backends = (IngredientSearchFilter,)
+    search_fields = ('^name',)
+
+
 class SubscriptionsViewSet(viewsets.ModelViewSet):
     """
-    Вьюесет позволяет посмотреть список подписок.
-    Переопределяем queryset так как в сериализаторе используем
-    dotted notation и лучше prefetch_related объекты author.
+    используется для обработки запросов,
+    связанных с операциями CRUD (создание,
+    чтение, обновление, удаление) для модели подписок.
     """
-    serializer_class = SubscribeSerializer
+    serializer_class = SubscriptionSerializer
     permission_classes = [IsAuthenticated, ]
     pagination_class = PageLimitPagination
 
@@ -58,43 +86,48 @@ class SubscriptionsViewSet(viewsets.ModelViewSet):
             user=self.request.user).prefetch_related('author')
 
 
-class SubscribeAPIView(APIView):
+class SubscribeCreateView(APIView):
     """
-    Класс для создания и удаления подписок
+    API для обработки запросов, связанных с
+    операциями CRUD (создание, чтение, обновление,
+    удаление) для модели подписок.
+    Два метода: post и delete, которые соответствуют
+    операциям создания и удаления подписки соответственно.
     """
-    permission_classes = [IsAuthenticated, ]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, author_id):
         author = get_object_or_404(User, id=author_id)
         if request.user == author:
-            return Response(
-                {'errors': 'Вы не можете подписаться на самого себя'},
+            return Response({
+                'errors': 'Вы не можете подписаться на самого себя'},
                 status=status.HTTP_400_BAD_REQUEST)
-        subscription = Subscribe.objects.filter(
+
+        subscription, created = Subscribe.objects.get_or_create(
             author=author, user=request.user)
-        if subscription.exists():
-            return Response(
-                {'errors': 'Вы уже подписаны на этого автора'},
-                status=status.HTTP_400_BAD_REQUEST)
-        queryset = Subscribe.objects.create(author=author, user=request.user)
-        serializer = SubscribeSerializer(
-            queryset, context={'request': request})
+
+        if not created:
+            return Response({'errors': 'Вы уже подписаны на этого автора'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = SubscriptionSerializer(
+            subscription, context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, author_id):
-        user = request.user
         author = get_object_or_404(User, id=author_id)
-        subscription = Subscribe.objects.filter(
-            author=author, user=user)
-        if not subscription.exists():
-            return Response(
-                {'errors': 'Вы еще не подписаны на этого автора'},
-                status=status.HTTP_400_BAD_REQUEST)
+        subscription = get_object_or_404(
+            Subscribe, author=author, user=request.user)
         subscription.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class FavoriteViewSet(viewsets.ModelViewSet):
+    """
+    реализует представление API для операций CRUD
+    (создание, чтение, обновление и удаление)
+    модели Favorite, связанной с моделью Recipe
+    """
     queryset = Favorite.objects.all()
     serializer_class = FavoriteRecipeSerializer
     permission_classes = [IsAuthenticated, ]
@@ -126,7 +159,8 @@ class FavoriteViewSet(viewsets.ModelViewSet):
 
 class ShoppingCartViewSet(CreateDestroyViewSet):
     """
-    Вьюсет позволяет добавлять и удалять рецепты из корзины покупок
+    Реализует представление API для добавления
+    и удаления рецептов из корзины покупок
     """
     queryset = ShoppingCart.objects.all()
     serializer_class = ShoppingCartSerializer
@@ -159,26 +193,18 @@ class ShoppingCartViewSet(CreateDestroyViewSet):
 
 
 class DownloadShoppingCart(APIView):
+    """
+    скачивание списка покупок в виде текстового файла
+    """
     permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
-        if not ShoppingCart.objects.filter(cart_owner=request.user).exists():
+        shopping_list = generate_shopping_list(request.user)
+        if shopping_list is None:
             return Response({'errors': 'В вашем списке покупок ничего нет'},
                             status=status.HTTP_400_BAD_REQUEST)
-        rec_pk = ShoppingCart.objects.filter(
-            cart_owner=request.user).values('recipe_id')
-        ingredients = IngredientInRecipe.objects.filter(
-            recipe_id__in=rec_pk).values(
-                'ingredient__name', 'ingredient__measurement_unit').annotate(
-                    amount=Sum('amount')).order_by()
 
-        text = 'Список покупок:\n\n'
-        for item in ingredients:
-            text += (f'{item["ingredient__name"]}: '
-                     f'{item["amount"]} '
-                     f'{item["ingredient__measurement_unit"]}\n')
-
-        response = HttpResponse(text, content_type='text/plain')
+        response = HttpResponse(shopping_list, content_type='text/plain')
         filename = 'shopping_list.txt'
         response['Content-Disposition'] = f'attachment; filename={filename}'
         return response
