@@ -89,7 +89,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user.follower.filter(author=obj).exists()
 
 
-class SubscribeSerializer(serializers.ModelSerializer):
+class SubscriptionSerializer(serializers.ModelSerializer):
     """
     Сериализатор для работы с моделью Subscribe.
     В результатах выводится личная информация об авторах,
