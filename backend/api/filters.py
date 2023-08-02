@@ -30,3 +30,10 @@ class RecipeFilter(FilterSet):
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
         return self.filter_queryset_by_model(queryset, ShoppingCart, value)
+
+
+class SearchFilterIngr(SearchFilter):
+    """
+    Кастомный фильтр для поиска по ингредиентам.
+    """
+    search_param = 'ingredient_name'
