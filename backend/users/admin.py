@@ -1,25 +1,16 @@
 from django.contrib import admin
-from django.contrib.auth import get_user_model
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import Group
 
-from .models import Follow
-
-CustomUser = get_user_model()
+from .models import Subscribe, User
 
 
-@admin.register(CustomUser)
-class CustomUserAdmin(UserAdmin):
-    list_display = ('username', 'first_name', 'last_name', 'email')
-    list_filter = ('email', 'first_name')
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    like_recipe = ('id', 'username', 'email', 'first_name', 'last_name')
     search_fields = ('username', 'email')
 
 
-@admin.register(Follow)
-class FollowAdmin(admin.ModelAdmin):
-    list_display = ('user', 'author')
-    list_filter = ('user', 'author')
-    search_fields = ('user', 'author')
-
-
-admin.site.unregister(Group)
+@admin.register(Subscribe)
+class SubscribeAdmin(admin.ModelAdmin):
+    like_recipe = ('id', 'user', 'author')
+    list_filter = ('user',)
+    search_fields = ('user__username', 'author__username')

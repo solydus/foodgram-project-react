@@ -1,54 +1,45 @@
-from djoser.views import UserViewSet as DjoserUserViewSet
-from rest_framework import permissions, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
-
 from django.shortcuts import get_object_or_404
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from .models import CustomUser, Follow
-from .serializers import CustomUserSerializer, FollowSerializer
+from users.models import Subscribe, User
+
+from .serializers import SubscribeSerializer
 
 
-class UsersViewSet(DjoserUserViewSet):
-    queryset = CustomUser.objects.all()
-    serializer_class = CustomUserSerializer
-    permission_classes = [permissions.AllowAny]
+class SubscribeCreateView(APIView):
+    """
+    Класс для создания и удаления подписок
+    """
+    permission_classes = [IsAuthenticated, ]
 
-    @action(methods=['GET'], detail=False,
-            permission_classes=[permissions.IsAuthenticated])
-    def subscriptions(self, request):
-        user = self.request.user
-        authors = CustomUser.objects.filter(followings__user=user)
-        page = self.paginate_queryset(authors)
-        serializer = FollowSerializer(
-            page, many=True, context={'request': request}
-        )
-        return self.get_paginated_response(serializer.data)
-
-    @action(methods=['POST'], detail=True,
-            permission_classes=[permissions.IsAuthenticated])
-    def subscribe(self, request, id):
-        user = self.request.user
-        author = get_object_or_404(CustomUser, id=id)
-        subscription = Follow.objects.filter(user=user, author=author)
+    def post(self, request, author_id):
+        author = get_object_or_404(User, id=author_id)
+        if request.user == author:
+            return Response(
+                {'errors': 'Вы не можете подписаться на самого себя'},
+                status=status.HTTP_400_BAD_REQUEST)
+        subscription = Subscribe.objects.filter(
+            author=author, user=request.user)
         if subscription.exists():
             return Response(
-                {'error': 'Вы подписаны на этого автора'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        serializer = FollowSerializer(author, context={'request': request})
-        Follow.objects.create(user=user, author=author)
+                {'errors': 'Вы уже подписаны на этого автора'},
+                status=status.HTTP_400_BAD_REQUEST)
+        queryset = Subscribe.objects.create(author=author, user=request.user)
+        serializer = SubscribeSerializer(
+            queryset, context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    @subscribe.mapping.delete
-    def delete_subscribe(self, request, id):
-        user = self.request.user
-        author = get_object_or_404(CustomUser, id=id)
-        subscription = Follow.objects.filter(user=user, author=author)
+    def delete(self, request, author_id):
+        user = request.user
+        author = get_object_or_404(User, id=author_id)
+        subscription = Subscribe.objects.filter(
+            author=author, user=user)
         if not subscription.exists():
             return Response(
-                {'error': 'Вы не подписаны на этого автора'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+                {'errors': 'Вы еще не подписаны на этого автора'},
+                status=status.HTTP_400_BAD_REQUEST)
         subscription.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
