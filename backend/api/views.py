@@ -47,19 +47,6 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    viewset для работы с моделью Ingredient.
-    Он также наследуется от ReadOnlyModelViewSet,
-    поэтому предоставляет только операции чтения для модели Ingredient.
-    """
-    queryset = Ingredient.objects.all()
-    serializer_class = IngredientSerializer
-    filter_backends = [IngredientSearchFilter]
-    search_fields = ['^name']
-    pagination_class = None
-
-
-class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
-    """
     используется для создания представления API,
     которое обеспечивает только чтение (read-only)
     операций для модели Ingredient
