@@ -13,7 +13,7 @@ from users.models import Subscribe, User
 from .shopping_utils import generate_shopping_list
 from .filters import IngredientSearchFilter, RecipeFilter
 from .mixins import CreateDestroyViewSet
-from .paginators import PageLimitPagination
+from .paginators import PageNumPagination
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (FavoriteRecipeSerializer, IngredientSerializer,
                           RecipeSerializer, ShoppingCartSerializer,
@@ -31,7 +31,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthorOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filterset_class = RecipeFilter
-    pagination_class = PageLimitPagination
+    pagination_class = PageNumPagination
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -66,7 +66,7 @@ class SubscriptionsViewSet(viewsets.ModelViewSet):
     """
     serializer_class = SubscriptionSerializer
     permission_classes = [IsAuthenticated, ]
-    pagination_class = PageLimitPagination
+    pagination_class = PageNumPagination
 
     def get_queryset(self):
         return Subscribe.objects.filter(
