@@ -1,9 +1,10 @@
 from django.db.models import Sum
 from recipes.models import IngredientInRecipe, ShoppingCart
 
+
 def generate_shopping_list(user):
     if not ShoppingCart.objects.filter(cart_owner=user).exists():
-        return None 
+        return None
 
     rec_pk = ShoppingCart.objects.filter(
         cart_owner=user).values('recipe_id')
