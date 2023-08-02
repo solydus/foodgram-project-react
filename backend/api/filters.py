@@ -1,3 +1,9 @@
+from django_filters.rest_framework import FilterSet, filters
+from rest_framework.filters import SearchFilter
+
+from recipes.models import Favorite, Recipe, ShoppingCart
+
+
 class RecipeFilter(FilterSet):
     """
     Фильтрует рецепты по отношению к тегам, автору,
