@@ -1,9 +1,3 @@
-from django_filters.rest_framework import FilterSet, filters
-from rest_framework.filters import SearchFilter
-
-from recipes.models import Favorite, Recipe, ShoppingCart
-
-
 class RecipeFilter(FilterSet):
     """
     Фильтрует рецепты по отношению к тегам, автору,
@@ -21,20 +15,13 @@ class RecipeFilter(FilterSet):
 
     def filter_queryset_by_model(self, queryset, model, value):
         obj_pk = model.objects.filter(
-            cart_owner=self.request.user).values('recipe_id')
+            recipe_lover=self.request.user).values('recipe_id')
         if value:
             return queryset.filter(pk__in=obj_pk)
         return queryset
 
-    def filter_is_favorited(self, queryset, name, value):
-        return self.filter_queryset_by_model(queryset, Favorite, value)
-
     def favorite_filter(self, queryset, name, value):
-        return self.filter_is_favorited(queryset, name, value)
+        return self.filter_queryset_by_model(queryset, Favorite, value)
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
         return self.filter_queryset_by_model(queryset, ShoppingCart, value)
-
-
-class SearchFilterIngr(SearchFilter):
-    search_param = 'name'
