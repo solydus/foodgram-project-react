@@ -5,11 +5,9 @@ from django.core.exceptions import ValidationError
 
 def validate_ingredients(ingredients_list, val_model):
     """
-    Метод проверяет существуют ли указанные ингредиенты
-    и правильно ли задано их количество.
-    Если нет - выбрасывает ValidationError.
-    Вместе с ingredients_list передаем модель Ingredient,
-    чтобы избежать circular import.
+    Проверяет список ингредиентов на наличие дубликатов и  заполнение.
+    :param ingredients: список словарей, содержащих данные в ингредиентах.
+    :param ingredient_model: модель ингредиента, используемая в приложении.
     """
     if len(ingredients_list) < 1:
         raise ValidationError(
@@ -34,14 +32,12 @@ def validate_ingredients(ingredients_list, val_model):
 
 def validate_tags(tags_list, val_model):
     """
-    Метод проверяет существует ли указанный тег.
-    Если нет - выбрасывает ValidationError.
-    Вместе с tags_list передаем модель Tag,
-    чтобы избежать circular import.
+    Проверяет корректность указанного времени приготовления.
+    :param cooking_time: время приготовления в минутах.
     """
     for tag in tags_list:
         if not val_model.objects.filter(pk=tag).exists():
-            raise ValidationError(f'{tag} - Такого тэга не существует')
+            raise ValidationError(f'{tag} - Такого тэга нет')
 
 
 def validate_cooking_time(value):
@@ -56,11 +52,8 @@ def validate_cooking_time(value):
 
 def validate_ingredient_name(value):
     """
-    Метод проверяет соответствует ли название ингредиента
-    заданному регулярному выражению.
-    Название может содержать %,-"«»&() и
-    русские и английские буквы.
-    Если нет - выбрасывает ValidationError.
+    Проверяет корректность названия ингредиента.
+    :param name: название ингредиента.
     """
     reg = r'^[\w%,"\'«»&()]+\Z'
     listik = value.split()
@@ -70,37 +63,30 @@ def validate_ingredient_name(value):
                 'Недопустимое значение имени {item}'})
 
 
-def validate_hex(value):
+def validate_hex(color):
     """
-    Метод проверяет соответствует ли код цвета
-    возможному
-    Если нет - выбрасывает ValidationError.
+    Проверяет корректность кода цвета.
+    :param color: код цвета в формате HEX.
     """
-    regex = "^#([A-Fa-f0-9]{3,6})$"
-    hehex = re.compile(regex)
-    if not re.search(hehex, value):
-        raise ValidationError({
-            'Недопустимое значение цвета'})
+    is_valid_type = isinstance(color, str)
+    is_valid_start = color.startswith('#')
+    is_valid_length = len(color) == 7
 
-
-def validate_username(value):
-    """
-    Метод проверяет соответствует username ожиданиям.
-    Если нет - выбрасывает ValidationError.
-    """
-    if value.lower() == 'me':
-        raise ValidationError({
-            f'Username не может быть {value}'})
+    if not is_valid_type or not is_valid_start or not is_valid_length:
+        raise ValidationError('Недопустимое значение цвета')
 
 
 def validate_real_name(value):
     """
-    Метод проверяет соответствует ли имя и фамилия
-    пользователя заданному регулярному выражению.
-    Если нет - выбрасывает ValidationError.
+    Валидатор для проверки корректности реального имени пользователя.
     """
-    reg = r'^[\w-]+\Z'
+    if not re.match(r'^[a-zA-Za-яА-ЯёЁ\s]+$', value):
+        raise ValidationError(('Введите корректное имя.'))
 
-    if not re.fullmatch(reg, value):
-        raise ValidationError({
-            'Недопустимое значение имени {value}'})
+
+def validate_username(value):
+    """
+    Валидатор для проверки корректности имени пользователя.
+    """
+    if not re.match(r'^[\w.@+-]+$', value):
+        raise ValidationError(('Имя пможет содержать только буквы,цифры'))
