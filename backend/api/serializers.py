@@ -145,7 +145,7 @@ class IngredientInRecipeSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    """ функция возвращает сериализованные 
+    """ функция возвращает сериализованные
     данные ингредиентов в виде списка."""
     author = UserSerializer(read_only=True)
     tags = TagSerializer(read_only=True, many=True)
