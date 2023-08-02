@@ -1,12 +1,12 @@
+from backend.api.utils import Base64ImageField
 from ingridients.models import Ingredient
 from rest_framework import exceptions, serializers
-
-from backend.api.utils import Base64ImageField
-from recipes.models import (FavoriteRecipe, IngredientsAmount, Recipe,
-                            ShoppingCart,)
 from tags.models import Tag
 from tags.serializers import TagSerializer
 from users.serializers import CustomUserSerializer
+
+from recipes.models import (FavoriteRecipe, IngredientsAmount, Recipe,
+                            ShoppingCart)
 
 
 class RecipeSerializer(serializers.ModelSerializer):

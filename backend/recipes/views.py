@@ -1,21 +1,20 @@
-from fpdf import FPDF
+from backend.api.paginations import LimitPagination
+from backend.api.permissions import AuthorStaffOrReadOnly
+from django.db.models import Sum
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from fpdf import FPDF
 from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from django.db.models import Sum
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
-
-from backend.api.paginations import LimitPagination
-from backend.api.permissions import AuthorStaffOrReadOnly
 from .filters import RecipeFilter
 from .mixins import CreateRetrievListPatchDestroyViewSet
 from .models import IngredientsAmount, Recipe
 from .serializers import (FavoriteRecipeSerializer,
                           RecipeCreateUpdateSerializer, RecipeListSerializer,
-                          ShoppingCartSerializer,)
+                          ShoppingCartSerializer)
 
 
 class RecipeViewSet(CreateRetrievListPatchDestroyViewSet):

@@ -1,9 +1,8 @@
+from api.validators import validate_hex, validate_ingredient_name
 from django.conf import settings
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.contrib.auth.validators import UnicodeUsernameValidator
-
-from api.validators import validate_hex, validate_ingredient_name
 from users.models import User
 
 
