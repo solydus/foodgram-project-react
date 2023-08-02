@@ -1,9 +1,8 @@
 from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
-from rest_framework import serializers
-
 from recipes.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
                             ShoppingCart, Tag)
+from rest_framework import serializers
 from users.models import Subscribe, User
 
 from .validators import (validate_cooking_time, validate_ingredients,
@@ -11,29 +10,27 @@ from .validators import (validate_cooking_time, validate_ingredients,
 
 
 class RecipeToRepresentationSerializer(serializers.ModelSerializer):
-    """
-    Укороченный сериализатор для отображения модели Recipe
-    в некоторых эндпоинтах.
-    """
+    """ отображения модели Recipe  """
     class Meta:
         model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time')
+        fields = ('id',
+                  'name',
+                  'image',
+                  'cooking_time')
 
 
 class TagSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для использования с моделью Tag.
-    """
+    """ модель Favorite. добавить/удалить список рецов """
     class Meta:
         model = Tag
-        fields = ('id', 'name', 'color', 'slug')
+        fields = ('id',
+                  'name',
+                  'color',
+                  'slug')
 
 
 class FavoriteRecipeSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для работы с моделью Favorite.
-    Используется для добавления и удаления рецептов из списка избранного.
-    """
+    """ Ingredient - просмотр списка или конкретного """
     id = serializers.ReadOnlyField(source='recipe.id')
     name = serializers.ReadOnlyField(source='recipe.name')
     image = serializers.CharField(source='recipe.image', read_only=True)
@@ -41,8 +38,14 @@ class FavoriteRecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Favorite
-        fields = ('id', 'name', 'image', 'cooking_time')
-        read_only_fields = ('id', 'name', 'image', 'cooking_time')
+        fields = ('id',
+                  'name',
+                  'image',
+                  'cooking_time')
+        read_only_fields = ('id',
+                            'name',
+                            'image',
+                            'cooking_time')
 
     def validate(self, data):
         user = self.context.get('request').user
@@ -60,29 +63,25 @@ class IngredientSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Ingredient
-        fields = ('id', 'name', 'measurement_unit')
+        fields = ('id',
+                  'name',
+                  'measurement_unit')
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для работы с моделью User.
-    Используется в качестве вложенного сериализатора
-    при отображении рецептов в сериадизаторе RecipeSerializer.
-    """
+    """ работает с User, отображение рецептов в RecipeSerializer."""
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ('email', 'id',
-                  'username', 'first_name',
-                  'last_name', 'is_subscribed')
+        fields = ('email',
+                  'id',
+                  'username',
+                  'first_name',
+                  'last_name',
+                  'is_subscribed')
 
     def get_is_subscribed(self, obj):
-        """
-        Метод возвращает False, если юзер не подписан на пользователя
-        или если запрос сделан неавторизованным юзером, True - если
-        объект подписки существует.
-        """
         user = self.context['request'].user
         if user.is_anonymous:
             return False
@@ -90,11 +89,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для работы с моделью Subscribe.
-    В результатах выводится личная информация об авторах,
-    перечень созданных ими рецептов и количество рецептов.
-    """
+    """ вывели инфу про автора/рецы """
     email = serializers.ReadOnlyField(source='author.email')
     id = serializers.ReadOnlyField(source='author.id')
     username = serializers.ReadOnlyField(source='author.username')
@@ -139,19 +134,10 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
 
 class IngredientInRecipeSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для работы с моделью IngredientInRecipe.
-    Используется для отображения ингредиентов в RecipeSerializer.
-    """
-    id = serializers.ReadOnlyField(
-        source='ingredient.id',
-    )
-    name = serializers.ReadOnlyField(
-        source='ingredient.name',
-    )
+    id = serializers.ReadOnlyField(source='ingredient.id')
+    name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
-        source='ingredient.measurement_unit',
-    )
+        source='ingredient.measurement_unit')
 
     class Meta:
         model = IngredientInRecipe
@@ -159,9 +145,8 @@ class IngredientInRecipeSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для работы с моделью Recipe.
-    """
+    """ функция возвращает сериализованные 
+    данные ингредиентов в виде списка."""
     author = UserSerializer(read_only=True)
     tags = TagSerializer(read_only=True, many=True)
     ingredients = serializers.SerializerMethodField(read_only=True)
@@ -172,24 +157,30 @@ class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = (
-            'id', 'tags', 'author',
-            'ingredients', 'is_favorited',
-            'is_in_shopping_cart', 'name',
-            'image', 'text', 'cooking_time')
+            'id',
+            'tags',
+            'author',
+            'ingredients',
+            'is_favorited',
+            'is_in_shopping_cart',
+            'name',
+            'image',
+            'text',
+            'cooking_time')
 
     def get_is_favorited(self, obj):
         request = self.context.get('request')
-        if not request or request.user.is_anonymous:
-            return False
-        return Favorite.objects.filter(
-            recipe=obj, recipe_lover=request.user).exists()
+        if request and not request.user.is_anonymous:
+            return Favorite.objects.filter(
+                recipe=obj, recipe_lover=request.user).exists()
+        return False
 
     def get_is_in_shopping_cart(self, obj):
         request = self.context.get('request')
-        if not request or request.user.is_anonymous:
-            return False
-        return ShoppingCart.objects.filter(
-            recipe=obj, cart_owner=request.user).exists()
+        if request and not request.user.is_anonymous:
+            return ShoppingCart.objects.filter(
+                recipe=obj, cart_owner=request.user).exists()
+        return False
 
     def get_ingredients(self, obj):
         queryset = IngredientInRecipe.objects.filter(recipe=obj)
