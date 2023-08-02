@@ -12,7 +12,7 @@ from users.models import Subscribe, User
 
 from .shopping_utils import generate_shopping_list
 from .filters import IngredientSearchFilter, RecipeFilter
-from .mixins import CreateDestroyViewSet
+from .mixins import CreateDestroyAll
 from .paginators import PageNumPagination
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (FavoriteRecipeSerializer, IngredientSerializer,
@@ -144,7 +144,7 @@ class FavoriteViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ShoppingCartViewSet(CreateDestroyViewSet):
+class ShoppingCartViewSet(CreateDestroyAll):
     """
     Реализует представление API для добавления
     и удаления рецептов из корзины покупок
