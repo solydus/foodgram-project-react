@@ -21,42 +21,26 @@ from .serializers import (FavoriteRecipeSerializer, IngredientSerializer,
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    """
-    Вьюсет для просмотра списка или одного рецепта (доступно всем),
-    создания (доступно авторизованным),
-    изменения или удаления автором его рецепта.
-    Доступна фильтрация по избранному, автору, списку покупок и тегам.
-    """
     queryset = Recipe.objects.all()
-    pagination_class = PageLimitPagination
-    filter_backends = (DjangoFilterBackend,)
-    filterset_class = RecipeFilter
     serializer_class = RecipeSerializer
     permission_classes = [IsAuthorOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = RecipeFilter
+    pagination_class = PageLimitPagination
 
 
-class TagViewSet(mixins.ListModelMixin,
-                 mixins.RetrieveModelMixin,
-                 viewsets.GenericViewSet):
-    # Запрос, который будет использоваться для получения объектов Tag
+class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
-    # Сериализатор для преобразования объектов Tag в данные JSON
     serializer_class = TagSerializer
+    pagination_class = None
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    По аналогии с тэгами ингридиенты можно только читать
-    (получить весь list или каждый по id).
-    Добавление в список ингридиентов доступно только через админку.
-    QUERY PARAMETERS: name.
-    Поиск по частичному вхождению в начале названия ингредиента.
-    """
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+    filter_backends = [IngredientSearchFilter]
+    search_fields = ['^name']
     pagination_class = None
-    filter_backends = (IngredientSearchFilter,)
-    search_fields = ('^name',)
 
 
 class SubscriptionsViewSet(viewsets.ModelViewSet):
