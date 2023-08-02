@@ -21,7 +21,7 @@ class RecipeFilter(FilterSet):
 
     def filter_queryset_by_model(self, queryset, model, value):
         obj_pk = model.objects.filter(
-            recipe_lover=self.request.user).values('recipe_id')
+            cart_owner=self.request.user).values('recipe_id')
         if value:
             return queryset.filter(pk__in=obj_pk)
         return queryset
