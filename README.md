@@ -45,8 +45,7 @@
   sudo docker run hello-world
 
   5. Установка Docker Compose:
-  6. 
-Загрузите текущую стабильную версию Docker Compose:
+  6. Загрузите текущую версию Docker Compose:
   sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 
 Дайте исполняемые права для файла Docker Compose:
