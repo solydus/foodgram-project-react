@@ -10,7 +10,7 @@ class RecipeFilter(FilterSet):
     избранному и нахождению в корзине пользователя.
     """
     tags = filters.AllValuesMultipleFilter(field_name='tags__slug')
-    is_favorited = filters.BooleanFilter(method='favorite_filter')
+    is_favorited = filters.BooleanFilter(method='filter_is_favorited')
     is_in_shopping_cart = filters.BooleanFilter(
         method='filter_is_in_shopping_cart'
     )
@@ -18,13 +18,6 @@ class RecipeFilter(FilterSet):
     class Meta:
         model = Recipe
         fields = ('tags', 'author', 'is_favorited', 'is_in_shopping_cart')
-
-    def filter_queryset_by_model(self, queryset, model, value):
-        obj_pk = model.objects.filter(
-            recipe_lover=self.request.user).values('recipe_id')
-        if value:
-            return queryset.filter(pk__in=obj_pk)
-        return queryset
 
     def filter_is_favorited(self, queryset, name, value):
         reс_pk = Favorite.objects.filter(
