@@ -8,14 +8,21 @@
 1. клонируем git: git clone ...;
 2. делаем файл .env, заполняем его по форме:
   SECRET_KEY=секретный ключ django проекта
+
   DB_ENGINE=DB_ENGINE
+  
   DB_NAME=DB_NAME
+  
   POSTGRES_USER=POSTGRES_USER
+  
   POSTGRES_PASSWORD=POSTGRES_PASSWORD
+  
   DB_HOST=DB_HOST
+  
   DB_PORT=DB_PORT
-3. поднимаем линукс на сервере';
-4. Установка Docker:
+  
+4. поднимаем линукс на сервере';
+5. Установка Docker:
 
 Обновите пакеты системы командой:
   sudo apt update
