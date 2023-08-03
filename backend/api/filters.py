@@ -26,8 +26,7 @@ class RecipeFilter(FilterSet):
 
         if value:
             return queryset.filter(pk__in=item_ids)
-
-    return queryset
+        return queryset
 
     def favorite_filter(self, queryset, name, value):
         return self.custom_filter(queryset, name, value, Favorite)
