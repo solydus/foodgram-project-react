@@ -30,7 +30,11 @@ class RecipeFilter(FilterSet):
         return self.filter_queryset_by_model(queryset, Favorite, value)
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
-        return self.filter_queryset_by_model(queryset, ShoppingCart, value)
+        reс_pk = ShoppingCart.objects.filter(
+            cart_owner=self.request.user).values('recipe_id')
+        if value:
+            return queryset.filter(pk__in=reс_pk)
+        return queryset
 
 
 class SearchFilterIngr(SearchFilter):
