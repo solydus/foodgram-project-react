@@ -63,5 +63,7 @@
 12. приммените миграции:
   docker compose exec backend python manage.py migrate
 13. Перейдите по ip-адресу своего сервера
+
 ???
-14. profit;
+
+15. profit;
