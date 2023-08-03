@@ -23,7 +23,7 @@ services:
     env_file: .env
 
   frontend:
-    image: kirrs911/foodgram_frontend:latest
+    image: solydus/frontending:latest
     volumes:
       - ../frontend/:/app/result_build/
 
