@@ -10,7 +10,7 @@ class RecipeFilter(FilterSet):
     избранному и нахождению в корзине пользователя.
     """
     tags = filters.AllValuesMultipleFilter(field_name='tags__slug')
-    is_favorited = filters.BooleanFilter(method='filter_is_favorited')
+    is_favorited = filters.BooleanFilter(method='favorite_filter')
     is_in_shopping_cart = filters.BooleanFilter(
         method='filter_is_in_shopping_cart'
     )
@@ -19,20 +19,18 @@ class RecipeFilter(FilterSet):
         model = Recipe
         fields = ('tags', 'author', 'is_favorited', 'is_in_shopping_cart')
 
-    def custom_filter(self, queryset, name, value, model):
-        item_ids = model.objects.filter(
-            cart_owner=self.request.user
-        ).values_list('recipe_id', flat=True)
-
+    def filter_queryset_by_model(self, queryset, model, value):
+        obj_pk = model.objects.filter(
+            recipe_lover=self.request.user).values('recipe_id')
         if value:
-            return queryset.filter(pk__in=item_ids)
+            return queryset.filter(pk__in=obj_pk)
         return queryset
 
     def favorite_filter(self, queryset, name, value):
-        return self.custom_filter(queryset, name, value, Favorite)
+        return self.filter_queryset_by_model(queryset, Favorite, value)
 
-    def shopping_cart_filter(self, queryset, name, value):
-        return self.custom_filter(queryset, name, value, ShoppingCart)
+    def filter_is_in_shopping_cart(self, queryset, name, value):
+        return self.filter_queryset_by_model(queryset, ShoppingCart, value)
 
 
 class SearchFilterIngr(SearchFilter):
