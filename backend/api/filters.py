@@ -19,19 +19,21 @@ class RecipeFilter(FilterSet):
         model = Recipe
         fields = ('tags', 'author', 'is_favorited', 'is_in_shopping_cart')
 
-    def filter_is_favorited(self, queryset, name, value):
-        reс_pk = Favorite.objects.filter(
-            recipe_lover=self.request.user).values('recipe_id')
-        if value:
-            return queryset.filter(pk__in=reс_pk)
-        return queryset
+    def custom_filter(self, queryset, name, value, model):
+        item_ids = model.objects.filter(
+            cart_owner=self.request.user
+        ).values_list('recipe_id', flat=True)
 
-    def filter_is_in_shopping_cart(self, queryset, name, value):
-        reс_pk = ShoppingCart.objects.filter(
-            cart_owner=self.request.user).values('recipe_id')
         if value:
-            return queryset.filter(pk__in=reс_pk)
-        return queryset
+            return queryset.filter(pk__in=item_ids)
+
+    return queryset
+
+    def favorite_filter(self, queryset, name, value):
+        return self.custom_filter(queryset, name, value, Favorite)
+
+    def shopping_cart_filter(self, queryset, name, value):
+        return self.custom_filter(queryset, name, value, ShoppingCart)
 
 
 class SearchFilterIngr(SearchFilter):
