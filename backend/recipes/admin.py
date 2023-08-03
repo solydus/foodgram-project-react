@@ -40,17 +40,6 @@ class TagAdmin(admin.ModelAdmin):
     list_filter = ('name',)
 
 
-# @admin.register(IngredientInRecipe)
-# class IngredientInRecipeAdmin(admin.ModelAdmin):
-#     list_display = (
-#         'id',
-#         'recipe',
-#         'ingredient',
-#         'amount',
-#     )
-#     list_filter = ('ingredient',)
-
-
 @admin.register(Favorite)
 class Favorite(admin.ModelAdmin):
     list_display = (
